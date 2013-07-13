@@ -1,0 +1,21 @@
+{
+    "require": {
+        "silex/silex": "1.*",
+        "phpunit/phpunit": "3.7.*",
+        "symfony/browser-kit": "2.3.*",
+        "doctrine/orm": "2.*",
+        "doctrine/doctrine-fixtures-bundle": "dev-master",
+        "doctrine/data-fixtures" : "dev-master",
+        "dflydev/doctrine-orm-service-provider": "1.*",
+        "symfony/yaml": "2.*",
+        "symfony/security": "2.*",
+        "monolog/monolog": "1.*",
+        "ircmaxell/password-compat": "1.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Pfmgr": "src/",
+            "Pfmgr\\Tests": "tests/"
+        }
+    }
+}
