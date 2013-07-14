@@ -2,6 +2,8 @@
 
 namespace Pfmgr\Entity;
 
+use JsonSerializable;
+
 /**
  * @Entity @Table(name="account_transaction")
  *
@@ -9,7 +11,7 @@ namespace Pfmgr\Entity;
  * @author Tom Ploskina Jr. <tploskina@gmail.com>
  * @license http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  **/
-class AccountTransaction
+class AccountTransaction implements JsonSerializable
 {
     /**
      * @Id @Column(type="integer") @GeneratedValue
@@ -39,6 +41,26 @@ class AccountTransaction
      * @ManyToOne(targetEntity="Account", inversedBy="ownedAccountTransactions")
      */
     protected $account;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return array(
+            'id' => $this->getId(),
+            'accountName' => $this->account->getName(),
+            'accountBalance' => $this->account->getBalance(),
+            'amount' => $this->getAmount(),
+            'description' => $this->getDescription(),
+            'transactionDate' => $this->getTransactionDate()
+        );
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
 
     public function setAccount($account)
     {
@@ -77,6 +99,6 @@ class AccountTransaction
 
     public function getTransactionDate()
     {
-        return $this->transactionDate;
+        return $this->transactionDate->format('F j, Y, g:i a');
     }
 }

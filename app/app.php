@@ -34,7 +34,7 @@ $app->register(new Silex\Provider\ServiceControllerServiceProvider());
 $app->register(new DoctrineServiceProvider(), $app['db.options']);
 
 $app->register(new DoctrineOrmServiceProvider, array(
-    //"orm.proxies_dir" => "/path/to/proxies",
+    "orm.proxies_dir" => __DIR__ . "/../orm/proxies",
     "orm.em.options" => array(
         "mappings" => array(
             array(
@@ -46,6 +46,7 @@ $app->register(new DoctrineOrmServiceProvider, array(
     )
 ));
 
+// Fixtures used by unit tests to populate database for functional tests
 $app['orm.fixtures'] = $app->share(function ($app){
     return new Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle;
 });
@@ -98,6 +99,14 @@ $app['controller.account'] = $app->share(function() use ($app) {
     return new Pfmgr\Controller\Account();
 });
 $app->post('/account/create', "controller.account:createAction");
+$app->get('/account/{id}', "controller.account:fetchAction");
+
+$app['controller.transaction'] = $app->share(function() use ($app) {
+    return new Pfmgr\Controller\AccountTransaction();
+});
+$app->post('/transaction/create', "controller.transaction:createAction");
+$app->get('/transaction/{id}', "controller.transaction:fetchAction");
+$app->get('/transaction/account/{id}', "controller.transaction:fetchByAccountAction");
 
 // must return $app for unit testing to work
 return $app;

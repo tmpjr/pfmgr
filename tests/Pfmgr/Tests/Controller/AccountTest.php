@@ -30,4 +30,26 @@ class AccountTest extends TestBase
         $this->assertJson($data);
         $this->assertTrue(201 === $client->getResponse()->getStatusCode());
     }
+
+    public function testFetchActionIsValid()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/account/1');
+        $response = $client->getResponse();
+        $data = $response->getContent();
+
+        $this->assertTrue($client->getResponse()->isOk());
+        $this->assertTrue(200 === $client->getResponse()->getStatusCode());
+        $this->assertJson($data);
+    }
+
+    public function testFetchActionErrorReturns403()
+    {
+        $client = $this->createClient();
+        $client->request('GET', '/account/0');
+        $response = $client->getResponse();
+        $data = $response->getContent();
+
+        $this->assertTrue(403 === $client->getResponse()->getStatusCode());
+    }
 }
