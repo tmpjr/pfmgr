@@ -107,6 +107,7 @@ $app['controller.transaction'] = $app->share(function() use ($app) {
 $app->post('/transaction/create', "controller.transaction:createAction");
 $app->get('/transaction/{id}', "controller.transaction:fetchAction");
 $app->get('/transaction/account/{id}', "controller.transaction:fetchByAccountAction");
+$app->get('/transaction/user/{id}', "controller.transaction:fetchByUserAction");
 
 // must return $app for unit testing to work
 return $app;

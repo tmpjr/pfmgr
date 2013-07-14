@@ -5,7 +5,7 @@ namespace Pfmgr\Controller;
 use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pfmgr\Exception;
-use Pfmgr\Entity\Account;
+use Pfmgr\Repository\AccountTransaction as Repository;
 
 class AccountTransaction
 {
@@ -40,17 +40,14 @@ class AccountTransaction
     {
         $accountId = $request->get('id');
         $account = $app['orm.em']->find('Pfmgr\Entity\Account', $accountId);
-        if (!$account instanceof Account) {
-            throw new InvalidArgumentException("Invalid account provided");
+        if (!$account instanceof \Pfmgr\Entity\Account) {
+            throw new \InvalidArgumentException("Invalid account provided");
         }
 
         $results = $app['orm.em']->getRepository('Pfmgr\Entity\AccountTransaction')
                         ->findBy(array('account' => $account));
-        if (count($results) < 1) {
-            throw new Exception("Account contains no transactions.");
-        } else {
-            return $app->json($results);
-        }
+
+        return $app->json($results);
     }
 
     /**
@@ -67,13 +64,13 @@ class AccountTransaction
 
         $description = $request->get('inputDescription');
         if (empty($description)) {
-            throw new InvalidArgumentException("Transaction description not valid input");
+            throw new \InvalidArgumentException("Transaction description not valid input");
         }
 
         $accountId = $request->get('inputAccountId');
         $account = $app['orm.em']->find('Pfmgr\Entity\Account', $accountId);
-        if (!$account instanceof Account) {
-            throw new InvalidArgumentException("Invalid account provided");
+        if (!$account instanceof \Pfmgr\Entity\Account) {
+            throw new \InvalidArgumentException("Invalid account provided");
         }
 
         try {
@@ -85,5 +82,21 @@ class AccountTransaction
             $app['monolog']->addError($e->getMessage());
             throw new Exception('Transaction could not be created.');
         }
+    }
+
+    /**
+     * RESTful GET route to get all transactions for a given user
+     *
+     * @param Symfony\Component\HttpFoundation\Request $request
+     * @param Silex\Application $app
+     * @throws InvalidArgumentException
+     * @return object Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function fetchByUserAction(Request $request, Application $app)
+    {
+        $id = $request->get('id');
+        $repository = $app['orm.em']->getRepository('\Pfmgr\Entity\AccountTransaction');
+        $results = $repository->findTransactionsByUser($id);
+        return $app->json($results);
     }
 }

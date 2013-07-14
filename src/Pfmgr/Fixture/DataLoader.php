@@ -27,6 +27,15 @@ class DataLoader implements FixtureInterface
         $manager->persist($user);
         $manager->flush();
 
+        $user2 = new User;
+        $user2->setEmail('troy@fortythree.com');
+        $user2->setPassword($encoder->encodePassword('nhy6&UJM', null));
+        $user2->setEnabled(1);
+        $user2->setRoles('ROLE_USER');
+        $user2->setCreated(new \Datetime);
+        $manager->persist($user2);
+        $manager->flush();
+
         $currencyDollar = new Currency;
         $currencyDollar->setName('United States dollar');
         $currencyDollar->setCode('USD');
@@ -66,10 +75,21 @@ class DataLoader implements FixtureInterface
         $manager->flush();
 
         $account2 = new Account;
-        $account2->setOwner($user);
+        $account2->setOwner($user2);
         $account2->setName('Checking');
-        $account2->setCurrency($currencyEuro);
+        $account2->setCurrency($currencyDollar);
+        $account2->addTransaction(25000, 'Initial Deposit', new \DateTime);
+        $account2->addTransaction(1500, 'May Paycheck', new \DateTime);
         $manager->persist($account2);
         $manager->flush();
+        $accId = $account2->getId();
+        $acc1 = $manager->find('Pfmgr\Entity\Account', $accId);
+        $acc2 = $manager->find('Pfmgr\Entity\Account', $accId);
+        $acc1->addTransaction(-8800, 'Mortgage', new \DateTime);
+        $acc2->addTransaction(-750.45, 'BMW Payment', new \DateTime);
+        $manager->persist($acc1);
+        $manager->persist($acc2);
+        $manager->flush();
+
     }
 }
