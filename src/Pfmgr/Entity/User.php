@@ -4,7 +4,8 @@ namespace Pfmgr\Entity;
 use JsonSerializable;
 
 /**
- * @Entity @Table(name="user")
+ * @Entity(repositoryClass="\Pfmgr\Repository\User")
+ * @Table(name="user")
  *
  * @copyright 2013 Tom Ploskina Jr. <tploskina@gmail.com>
  * @author Tom Ploskina Jr. <tploskina@gmail.com>

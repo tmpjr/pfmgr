@@ -2,6 +2,7 @@
 
 namespace Pfmgr\Fixture;
 
+use Silex\Application;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
@@ -10,17 +11,32 @@ use Pfmgr\Entity\Account;
 use Pfmgr\Entity\Currency;
 use Pfmgr\Entity\AccountTransaction;
 
+/**
+ *  Data fixture is to populate the database with some intial values. Its
+ *  main use case is for unit testing
+ *
+ * @copyright 2013 Tom Ploskina Jr. <tploskina@gmail.com>
+ * @author Tom Ploskina Jr. <tploskina@gmail.com>
+ * @license http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
+ * @todo Break out into classes for each entity
+ **/
 class DataLoader implements FixtureInterface
 {
+    private $app;
+
+    public function __construct(Application $app)
+    {
+        $this->app = $app;
+    }
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
-        $encoder = new BCryptPasswordEncoder(10);
+        $encoder = $this->app['security.encoder.digest'];
         $user = new User;
         $user->setEmail('el.toro@thebull.com');
-        $user->setPassword($encoder->encodePassword('nhy6&UJM', null));
+        $user->setPassword($encoder->encodePassword('test', null));
         $user->setEnabled(1);
         $user->setRoles('ROLE_USER');
         $user->setCreated(new \Datetime);

@@ -59,6 +59,34 @@ $app->before(function (Request $request) {
     }
 });
 
+// Security definition.
+$app->register(new SecurityServiceProvider(), array(
+    'security.firewalls' => array(
+        // Login URL is open to everybody.
+        'login' => array(
+            'pattern' => '^/auth/login$',
+            'anonymous' => true,
+        ),
+        // Any other URL requires auth.
+        'index' => array(
+            'pattern' => '^.*$',
+            'form'      => array(
+                'login_path'          => '/auth/login',
+                'check_path'          => '/auth/check',
+                'username_parameter'  => 'username',
+                'password_parameter'  => 'password',
+                'default_target_path' => '/auth/status',
+                //'failure_path'        => '/auth/failure'
+            ),
+            'anonymous' => false,
+            //'logout'    => array('logout_path' => '/auth/logout'),
+            'users'     => $app->share(function() use ($app) {
+                return new Pfmgr\Provider\User($app);
+            }),
+        ),
+    ),
+));
+
 // Define a custom encoder for Security/Authentication
 $app['security.encoder.digest'] = $app->share(function ($app) {
     // uses the password-compat encryption
@@ -73,6 +101,24 @@ $app->error(function (\Exception $e, $code) use($app) {
         $message = $e->getMessage();
     }
     return $app->json($message, 403);
+});
+
+$app->get('/auth/login', function() use ($app) {
+    return $app->json('Not Authenticated', 401);
+});
+
+$app->get('/auth/logout', function() use ($app) {
+    $app['security']->setToken(null);
+    $app['session']->invalidate();
+    return $app->json('Not Authenticated', 401);
+});
+
+$app->get('/auth/status', function() use ($app) {
+    $user = $app['security']->getToken()->getUser();
+    return $app->json(array(
+        'username' => $user->getUsername(),
+        'roles' => $user->getRoles()
+    ));
 });
 
 // General Service Provder for Controllers

@@ -39,7 +39,7 @@ class TestBase extends WebTestCase
             SET FOREIGN_KEY_CHECKS=1; COMMIT;');
 
         // Run fixtures to populate database
-        $loader = new DataLoader;
+        $loader = new DataLoader($this->app);
         $loader->load($this->app['orm.em']);
     }
 }
