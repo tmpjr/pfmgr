@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html ng-app="Application" ng-controller="AppCtrl">
+  <head>
+    <title>pfMgr</title>
+
+
+    <!-- font awesome from BootstrapCDN -->
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+
+    <!-- compiled CSS --><% styles.forEach( function ( file ) { %>
+    <link rel="stylesheet" type="text/css" href="<%= file %>" /><% }); %>
+
+    <!--[if IE 7>
+    <link rel="stylesheet" href="assets/font-awesome-ie7.min.css />
+    <![endif]-->
+
+    <!-- compiled CSS --><% scripts.forEach( function ( file ) { %>
+    <script type="text/javascript" src="<%= file %>"></script><% }); %>
+
+    <!-- it's stupid to have to load it here, but this is for the +1 button -->
+    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
+      { "parsetags": "explicit" }
+    </script>
+  </head>
+  <body class="auth-application waiting-for-angular">
+    <div id="login-holder" modal="modalLogin" close="close()" options="opts">
+      <form name="usrLoginForm" ng-submit="login()" novalidate>
+        <div class="modal-header">
+            <h3>Login to your account</h3>
+        </div>
+        <div class="modal-body">
+          <div class="control-group" ng-class="{error: usrRegFrm.inputEmail.$error.required && loginFormSubmitted}">
+            <label for="inputEmail" class="control-label">Email</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-envelope"></i></span>
+                <input type="text" class="input-xlarge" ng-model="credentials.inputEmail"
+                  id="inputEmail" name="inputEmail" placeholder="Email" required>
+              </div>
+              <span class="help-inline" ng-show="loginFormSubmitted && usrLoginForm.inputEmail.$error.required">Required!</span>
+            </div>
+          </div>
+          <div class="control-group" ng-class="{error: usrRegFrm.inputPassword.$error.required && loginFormSubmitted}">
+            <label for="inputPassword" class="control-label">Password</label>
+            <div class="controls">
+              <div class="input-prepend">
+                <span class="add-on"><i class="icon-lock"></i></span>
+                <input ng-model="credentials.inputPassword" type="password" class="input-xlarge"
+                  id="inputPassword" name="inputPassword" placeholder="Password" required>
+              </div>
+              <span class="help-inline" ng-show="loginFormSubmitted && usrLoginForm.inputPassword.$error.required">Required!</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Sign In</button>
+        </div>
+      </form>
+    </div>
+    <div id="content" ng-show="(!modalLogin)">
+      <div ng-controller="AppCtrl" class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container-fluid">
+            <a class="brand" href="#"><span>pfMgr<span class="version">v0.1.0</span></span></a>
+            <ul class="nav pull-right">
+              <li style="padding: 4px 12px 0 0;">
+                <p class="nav navbar-text" ng-show="userConfig.userLoggedIn" ng-bind="username"></p>
+              </li>
+              <li style="padding-right: 6px;"><button title="Manage your account" class="btn btn-primary"><i class="icon-user icon-white"></i></button></li>
+              <li><button title="Logout" class="btn btn-danger" ng-click="logout()"><i class="icon-off icon-white"></i></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid">
+        <div class="row-fluid">
+          <div class="span12" ui-view="main"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
