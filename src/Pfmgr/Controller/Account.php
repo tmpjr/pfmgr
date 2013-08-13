@@ -6,7 +6,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pfmgr\Exception\AccountNotFoundException;
 use Pfmgr\Exception;
-use Pfmgr\Entity\User;
+use Pfmgr\Entity\User as UserEntity;
 use Pfmgr\Entity\Currency;
 
 class Account
@@ -78,5 +78,19 @@ class Account
             $app['monolog']->addError($e->getMessage());
             throw new Exception('Account could not be created.');
         }
+    }
+
+    public function fetchByUserAction(Request $request, Application $app)
+    {
+        $user = $app['security']->getToken()->getUser();
+        if (!$user instanceof UserEntity) {
+            throw new Exception(sprintf('Instances of "%s" are not supported.', get_class($user)));
+        }
+
+        $username = $user->getId();
+        $results = $app['orm.em']->getRepository('Pfmgr\Entity\Account')
+                        ->findBy(array('user' => $user));
+
+        return $app->json($results);
     }
 }

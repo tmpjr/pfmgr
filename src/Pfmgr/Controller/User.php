@@ -48,7 +48,7 @@ class User
         try {
             $pwd_hash = $app['security.encoder.digest']->encodePassword($request->get('inputPassword'), null);
             $user = new \Pfmgr\Entity\User;
-            $user->setEmail($request->get('inputEmail'));
+            $user->setUsername($request->get('inputEmail'));
             $user->setPassword($pwd_hash);
             $user->setRoles('ROLE_USER');
             $user->setEnabled(0);

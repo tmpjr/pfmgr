@@ -8,6 +8,8 @@
     "bootstrap": "~2.3.2",
     "angular-bootstrap": "~0.3.0",
     "angular-ui-router": "~0.0.1",
-    "angular-ui-utils": "~0.0.3"
+    "angular-ui-utils": "~0.0.3",
+		"ng-grid": "~2.0.7",
+    "angular-kendo-ui": "~0.5.*"
   }
 }

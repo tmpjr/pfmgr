@@ -1,6 +1,7 @@
 <?php
 
 namespace Pfmgr\Entity;
+use Symfony\Component\Security\Core\User\UserInterface;
 use JsonSerializable;
 
 /**
@@ -11,7 +12,7 @@ use JsonSerializable;
  * @author Tom Ploskina Jr. <tploskina@gmail.com>
  * @license http://www.opensource.org/licenses/BSD-3-Clause  The BSD 3-Clause License
  **/
-class User implements JsonSerializable
+class User implements UserInterface, JsonSerializable
 {
     /**
      * @Id @Column(type="integer") @GeneratedValue
@@ -23,7 +24,7 @@ class User implements JsonSerializable
      * @Column(type="string", length=120, unique=true)
      * @var string
      */
-    protected $email;
+    protected $username;
 
     /**
      * @Column(type="string", length=150)
@@ -73,7 +74,7 @@ class User implements JsonSerializable
     {
         return array(
             'id' => $this->getId(),
-            'email' => $this->getEmail(),
+            'username' => $this->getUsername(),
             'enabled' => $this->getEnabled(),
             'roles' => $this->getRoles()
         );
@@ -84,14 +85,14 @@ class User implements JsonSerializable
         return $this->id;
     }
 
-    public function setEmail($email)
+    public function setUsername($username)
     {
-        $this->email = $email;
+        $this->username = $username;
     }
 
-    public function getEmail()
+    public function getUsername()
     {
-        return $this->email;
+        return $this->username;
     }
 
     public function setPassword($password)
@@ -111,7 +112,7 @@ class User implements JsonSerializable
 
     public function getRoles()
     {
-        return $this->roles;
+        return array($this->roles);
     }
 
     public function setEnabled($enabled = 0)
@@ -132,5 +133,20 @@ class User implements JsonSerializable
     public function setUpdated(\DateTime $dt)
     {
         $this->updated = $dt;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function eraseCredentials()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSalt()
+    {
+        return null;
     }
 }

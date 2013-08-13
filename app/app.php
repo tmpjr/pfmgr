@@ -7,13 +7,14 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder;
+use Silex\Application;
 use Silex\Provider\SecurityServiceProvider;
 use Silex\Provider\UrlGeneratorServiceProvider;
 use Silex\Provider\DoctrineServiceProvider;
 use Dflydev\Silex\Provider\DoctrineOrm\DoctrineOrmServiceProvider;
 use Pfmgr\Exception;
 
-$app = new Silex\Application();
+$app = new Application();
 
 require __DIR__ . '/../resources/config/dev.php';
 
@@ -52,33 +53,34 @@ $app['orm.fixtures'] = $app->share(function ($app){
 });
 
 // The request body should only be parsed as JSON if the Content-Type header begins with application/json.
-$app->before(function (Request $request) {
+$app->before(function (Request $request) use ($app) {
     if (0 === strpos($request->headers->get('Content-Type'), 'application/json')) {
         $data = json_decode($request->getContent(), true);
         $request->request->replace(is_array($data) ? $data : array());
     }
-});
+}, Application::EARLY_EVENT);
 
-// Security definition.
+//Security definition.
 $app->register(new SecurityServiceProvider(), array(
     'security.firewalls' => array(
-        // Login URL is open to everybody.
         'login' => array(
             'pattern' => '^/auth/login$',
-            'anonymous' => true,
         ),
-        // Any other URL requires auth.
         'index' => array(
             'pattern' => '^.*$',
             'form'      => array(
-                'login_path'          => '/auth/login',
-                'check_path'          => '/auth/check',
-                'username_parameter'  => 'username',
-                'password_parameter'  => 'password',
-                'default_target_path' => '/auth/status',
+                'login_path' => '/auth/login',
+                'check_path' => '/auth/check',
+                'username_parameter' => 'username',
+                'password_parameter' => 'password',
+                // since this is a REST API, never redirect
+                // back to last location, fronnt end handles this
+                'always_use_default_target_path' => true,
+                'default_target_path'            => '/auth/status',
                 //'failure_path'        => '/auth/failure'
             ),
             'anonymous' => false,
+            // a custom logout route is used in because we do not want a redirect
             //'logout'    => array('logout_path' => '/auth/logout'),
             'users'     => $app->share(function() use ($app) {
                 return new Pfmgr\Provider\User($app);
@@ -87,8 +89,17 @@ $app->register(new SecurityServiceProvider(), array(
     ),
 ));
 
+// $app['security.authentication.logout_handler._proto'] = $app->protect(function () use ($app) {
+//     return $app->share(function () use ($app) {
+//         return new Pfmgr\Security\LogoutSuccessHandler(
+//             $app['security.http_utils'],
+//             '/'
+//         );
+//     });
+// });
+
 // Define a custom encoder for Security/Authentication
-$app['security.encoder.digest'] = $app->share(function ($app) {
+$app['security.encoder.digest'] = $app->share(function () {
     // uses the password-compat encryption
     return new BCryptPasswordEncoder(10);
 });
@@ -104,22 +115,41 @@ $app->error(function (\Exception $e, $code) use($app) {
 });
 
 $app->get('/auth/login', function() use ($app) {
-    return $app->json('Not Authenticated', 401);
+    return $app->json('Login page', 401);
 });
+
+// $app->get('/', function() use ($app) {
+//     return $app->json('You must login', 401);
+// });
 
 $app->get('/auth/logout', function() use ($app) {
     $app['security']->setToken(null);
     $app['session']->invalidate();
-    return $app->json('Not Authenticated', 401);
+    return $app->json('Logged out', 200);
 });
 
 $app->get('/auth/status', function() use ($app) {
     $user = $app['security']->getToken()->getUser();
     return $app->json(array(
+        'id' => $user->getId(),
         'username' => $user->getUsername(),
         'roles' => $user->getRoles()
     ));
 });
+
+// $app->post('/auth/check', function() use ($app) {
+//     return $app->json(array(
+//         'username' => 'bob',
+//         'roles' => array("ROLE_USER")
+//     ));
+// });
+
+// $app->get('/auth/status', function() use ($app) {
+//     return $app->json(array(
+//         'username' => 'bob',
+//         'roles' => array("ROLE_USER")
+//     ));
+// });
 
 // General Service Provder for Controllers
 $app->register(new Silex\Provider\ServiceControllerServiceProvider());
@@ -146,6 +176,7 @@ $app['controller.account'] = $app->share(function() use ($app) {
 });
 $app->post('/account/create', "controller.account:createAction");
 $app->get('/account/{id}', "controller.account:fetchAction");
+$app->get('/account/user/fetch', "controller.account:fetchByUserAction");
 
 $app['controller.transaction'] = $app->share(function() use ($app) {
     return new Pfmgr\Controller\AccountTransaction();
@@ -153,7 +184,7 @@ $app['controller.transaction'] = $app->share(function() use ($app) {
 $app->post('/transaction/create', "controller.transaction:createAction");
 $app->get('/transaction/{id}', "controller.transaction:fetchAction");
 $app->get('/transaction/account/{id}', "controller.transaction:fetchByAccountAction");
-$app->get('/transaction/user/{id}', "controller.transaction:fetchByUserAction");
+$app->get('/transaction/user/fetch', "controller.transaction:fetchByUserAction");
 
 // must return $app for unit testing to work
 return $app;

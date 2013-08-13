@@ -8,7 +8,8 @@ angular.module( 'Application', [
   'ui.bootstrap',
   'ngResource',
   'http-auth-interceptor',
-  'securityService'
+  'securityService',
+  'kendo.directives'
 ])
 
 .config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {

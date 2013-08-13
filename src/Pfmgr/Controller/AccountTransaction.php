@@ -6,6 +6,7 @@ use Silex\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Pfmgr\Exception;
 use Pfmgr\Repository\AccountTransaction as Repository;
+use Pfmgr\Entity\User as UserEntity;
 
 class AccountTransaction
 {
@@ -94,9 +95,13 @@ class AccountTransaction
      */
     public function fetchByUserAction(Request $request, Application $app)
     {
-        $id = $request->get('id');
+        $user = $app['security']->getToken()->getUser();
+        if (!$user instanceof UserEntity) {
+            throw new Exception(sprintf('Instances of "%s" are not supported.', get_class($user)));
+        }
+        $userId = $user->getId();
         $repository = $app['orm.em']->getRepository('\Pfmgr\Entity\AccountTransaction');
-        $results = $repository->findTransactionsByUser($id);
+        $results = $repository->findTransactionsByUser($userId);
         return $app->json($results);
     }
 }

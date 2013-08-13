@@ -35,7 +35,7 @@ class DataLoader implements FixtureInterface
     {
         $encoder = $this->app['security.encoder.digest'];
         $user = new User;
-        $user->setEmail('el.toro@thebull.com');
+        $user->setUsername('el.toro@thebull.com');
         $user->setPassword($encoder->encodePassword('test', null));
         $user->setEnabled(1);
         $user->setRoles('ROLE_USER');
@@ -44,7 +44,7 @@ class DataLoader implements FixtureInterface
         $manager->flush();
 
         $user2 = new User;
-        $user2->setEmail('troy@fortythree.com');
+        $user2->setUsername('troy@fortythree.com');
         $user2->setPassword($encoder->encodePassword('nhy6&UJM', null));
         $user2->setEnabled(1);
         $user2->setRoles('ROLE_USER');

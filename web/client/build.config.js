@@ -30,7 +30,9 @@ module.exports = {
     ctpl: [ 'src/common/**/*.tpl.html' ],
 
     html: [ 'src/index.html' ],
-    less: 'src/less/main.less'
+    less: 'src/less/main.less',
+
+    css: ['src/assets/*.css']
   },
 
   /**
@@ -49,15 +51,21 @@ module.exports = {
    */
   vendor_files: {
     js: [
+      'vendor/jquery/jquery.min.js',
       'vendor/angular/angular.js',
       'vendor/angular-resource/angular-resource.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js',
       'vendor/angular-ui-router/release/angular-ui-router.js',
       'vendor/angular-ui-utils/modules/route/route.js',
+      'vendor/ng-grid/ng-grid-2.0.7.min.js',
+      'vendor/ng-grid/plugins/ng-grid-flexible-height.js',
+      'vendor/kendo/js/kendo.web.min.js',
+      'vendor/angular-kendo-ui/build/angular-kendo.js',
       'vendor/http-auth-interceptor.js',
     ],
     css: [
+
     ]
   },
 };
